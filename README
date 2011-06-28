@@ -1,0 +1,2 @@
+I was not satisfied with any of the K Means Clustering algorithms written in C# that I could find online.
+I created this library to serve as a generic K Means Clustering library, its far from perfect but it works and I will continue to update it.
