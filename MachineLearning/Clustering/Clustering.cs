@@ -3,82 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpLearning {
-    /// <summary>
-    /// A class containing code related to clustering.
+namespace MachineLearning.Clustering {
+	/// <summary>
+    /// Contains functions, data structures, and algorithms to perform clustering and calculate distances between
+	/// IClusterable objects. Clustering can be used to find related pieces of data amongst a dataset with no relationships.
+	/// 
+	/// More information on Clustering from Wikipedia:
+	/// Cluster analysis or clustering is the assignment of a set of observations into subsets (called clusters) so that observations
+	/// in the same cluster are similar in some sense. Clustering is a method of unsupervised learning, and a common technique for 
+	/// statistical data analysis used in many fields, including machine learning, data mining, pattern recognition, image analysis,
+	/// information retrieval, and bioinformatics.
     /// </summary>
-    public class Clustering {
+    public class Algorithms {
 
         #region Data Structures
         /// <summary>
-        /// A data structure used to store our clusters while processing. Clusters will be returned as this data structure, simple iterate over Members to find out what is in each cluster.
+        /// A data structure used to store our clusters while processing.
+		/// Clusters will be returned as this data structure, simple iterate over Members to find out what is in each cluster.
         /// </summary>
         /// <typeparam name="T">The type of data on which we are performing k means clustering.</typeparam>
         public class Cluster<T> {
 
-            private Double[] _data;
-
+			/// <summary>
+			/// Constructor for the Cluster class.
+			/// </summary>
+			/// <param name="data">A Double[] representing the data points on which to cluster.</param>
             public Cluster(Double[] data) {
-                _data = data;
+                Data = data;
                 Members = new List<T>();
             }
 
-            public void SetData(Double[] data) {
-                _data = data;
-            }
+			/// <summary>
+			/// A Double[] exposed to allow clusters to have a "centroid" data point.
+			/// </summary>
+            public Double[] Data { get; set; }
 
-            public Double[] Data { get { return _data; } }
+			/// <summary>
+			/// A list of IClusterable objects that belong to this cluster.
+			/// </summary>
             public List<T> Members { get; set; }
-        }
-        #endregion
-
-        #region Distance Algorithms
-        /// <summary>
-        /// Calculates the pearson distance between two data points. Requires more than one value in each vector, otherwise distance is always zero.
-        /// </summary>
-        /// <param name="v1">The first vector of data points.</param>
-        /// <param name="v2">The second vector of data points.</param>
-        /// <returns>The pearson distance score between two vectors.</returns>
-        public static double PearsonDistance(double[] v1, double[] v2) {
-            double sum1 = v1.Sum();
-            double sum2 = v2.Sum();
-
-            double sum1Sq = 0.0;
-            double sum2Sq = 0.0;
-
-            foreach (var val in v1)
-                sum1Sq += Math.Pow(val, 2);
-            foreach (var val in v2)
-                sum2Sq += Math.Pow(val, 2);
-
-            double pSum = 0.0;
-            for (int i = 0; i < v1.Count(); ++i)
-                pSum += v1[i] * v2[i];
-
-            double num = pSum - (sum1 * sum2 / v1.Count());
-            double den = Math.Sqrt((sum1Sq - Math.Pow(sum1, 2) / v1.Count()) * (sum2Sq - Math.Pow(sum2, 2) / v1.Count()));
-            if (den == 0)
-                return 0;
-
-            return 1.0 - num / den;
-        }
-
-        /// <summary>
-        /// Calculates the manhattan distance between two vectors of double data points.
-        /// </summary>
-        /// <param name="v1">The first vector of data points for which to calculate manhattan distance.</param>
-        /// <param name="v2">THe second vector of data points for which to calculate manhattan distance.</param>
-        /// <returns>A double representing the manhattan distance between v1 and v2.</returns>
-        public static double ManhattanDistance(double[] v1, double[] v2) {
-            double sum = 0.0;
-
-            if (v1.GetUpperBound(0) != v2.GetUpperBound(0))
-                throw new System.ArgumentException("The number of elements in v1 must equal the number of elements in v2");
-
-            for (int i = 0; i < v1.Length; ++i)
-                sum += Math.Abs(v1[i] - v2[i]);
-
-            return sum;
         }
         #endregion
 
@@ -89,9 +52,10 @@ namespace SharpLearning {
         /// <typeparam name="T">The type of data to be clustered.</typeparam>
         /// <param name="k">The number of clusters to use.</param>
         /// <param name="iterationCount">The number of iterations to perform.</param>
+		/// <param name="distance">A function that acceps two double[] and retuns a double representing the distance between the two vectors.</param>
         /// <param name="rows">The set of data to cluster, must be IEnumerable with doubles representing the data points to cluster on.</param>
         /// <returns>A List of Cluster objects containing each of its members in the Members attribute.</returns>
-        public static List<Cluster<T>> KCluster<T>(int k, int iterationCount, List<T> rows) where T : IClusterable {
+        public static List<Cluster<T>> KCluster<T>(int k, int iterationCount, Func<double[], double[], double> distance, List<T> rows) where T : IClusterable {
 
             Random random = new Random();
 
@@ -145,7 +109,7 @@ namespace SharpLearning {
                     Cluster<T> bestCluster = centroids[0];
 
                     foreach (var cluster in centroids) {
-                        double d = ManhattanDistance(cluster.Data, row.ClusteringData);
+                        double d = distance(cluster.Data, row.ClusteringData);
                         if (d < bestDistance) {
                             bestDistance = d;
                             bestCluster = cluster;
@@ -179,7 +143,7 @@ namespace SharpLearning {
                             averages[index] /= centroid.Members.Count();
                     }
 
-                    centroid.SetData(averages);
+                    centroid.Data = averages;
                     centroid.Members.Clear();
                 }
             }

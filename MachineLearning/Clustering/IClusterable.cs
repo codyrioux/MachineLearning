@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpLearning {
-
+namespace MachineLearning.Clustering {
     /// <summary>
     /// Objects that implement this interface expose a Double[] named ClusteringData that can be used
     /// to perform clustering on the object.

@@ -1,2 +1,4 @@
 I was not satisfied with any of the K Means Clustering algorithms written in C# that I could find online.
 I created this library to serve as a generic K Means Clustering library, its far from perfect but it works and I will continue to update it.
+
+It doesn't look like visual studio test projects are available in the express edition, which is what I'm currently using when at home. As a result I'll be moving the tests to NUnit when I get a chance.
