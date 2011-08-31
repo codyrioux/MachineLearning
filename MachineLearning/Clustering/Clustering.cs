@@ -4,43 +4,43 @@ using System.Linq;
 using System.Text;
 
 namespace MachineLearning.Clustering {
-	/// <summary>
+    /// <summary>
     /// Contains functions, data structures, and algorithms to perform clustering and calculate distances between
-	/// IClusterable objects. Clustering can be used to find related pieces of data amongst a dataset with no relationships.
-	/// 
-	/// More information on Clustering from Wikipedia:
-	/// Cluster analysis or clustering is the assignment of a set of observations into subsets (called clusters) so that observations
-	/// in the same cluster are similar in some sense. Clustering is a method of unsupervised learning, and a common technique for 
-	/// statistical data analysis used in many fields, including machine learning, data mining, pattern recognition, image analysis,
-	/// information retrieval, and bioinformatics.
+    /// IClusterable objects. Clustering can be used to find related pieces of data amongst a dataset with no relationships.
+    /// 
+    /// More information on Clustering from Wikipedia:
+    /// Cluster analysis or clustering is the assignment of a set of observations into subsets (called clusters) so that observations
+    /// in the same cluster are similar in some sense. Clustering is a method of unsupervised learning, and a common technique for 
+    /// statistical data analysis used in many fields, including machine learning, data mining, pattern recognition, image analysis,
+    /// information retrieval, and bioinformatics.
     /// </summary>
     public class Algorithms {
 
         #region Data Structures
         /// <summary>
         /// A data structure used to store our clusters while processing.
-		/// Clusters will be returned as this data structure, simple iterate over Members to find out what is in each cluster.
+        /// Clusters will be returned as this data structure, simple iterate over Members to find out what is in each cluster.
         /// </summary>
         /// <typeparam name="T">The type of data on which we are performing k means clustering.</typeparam>
         public class Cluster<T> {
 
-			/// <summary>
-			/// Constructor for the Cluster class.
-			/// </summary>
-			/// <param name="data">A Double[] representing the data points on which to cluster.</param>
+            /// <summary>
+            /// Constructor for the Cluster class.
+            /// </summary>
+            /// <param name="data">A Double[] representing the data points on which to cluster.</param>
             public Cluster(Double[] data) {
                 Data = data;
                 Members = new List<T>();
             }
 
-			/// <summary>
-			/// A Double[] exposed to allow clusters to have a "centroid" data point.
-			/// </summary>
+            /// <summary>
+            /// A Double[] exposed to allow clusters to have a "centroid" data point.
+            /// </summary>
             public Double[] Data { get; set; }
 
-			/// <summary>
-			/// A list of IClusterable objects that belong to this cluster.
-			/// </summary>
+            /// <summary>
+            /// A list of IClusterable objects that belong to this cluster.
+            /// </summary>
             public List<T> Members { get; set; }
         }
         #endregion
@@ -52,7 +52,7 @@ namespace MachineLearning.Clustering {
         /// <typeparam name="T">The type of data to be clustered.</typeparam>
         /// <param name="k">The number of clusters to use.</param>
         /// <param name="iterationCount">The number of iterations to perform.</param>
-		/// <param name="distance">A function that acceps two double[] and retuns a double representing the distance between the two vectors.</param>
+        /// <param name="distance">A function that acceps two double[] and retuns a double representing the distance between the two vectors.</param>
         /// <param name="rows">The set of data to cluster, must be IEnumerable with doubles representing the data points to cluster on.</param>
         /// <returns>A List of Cluster objects containing each of its members in the Members attribute.</returns>
         public static List<Cluster<T>> KCluster<T>(int k, int iterationCount, Func<double[], double[], double> distance, List<T> rows) where T : IClusterable {
