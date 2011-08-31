@@ -57,6 +57,9 @@ namespace MachineLearning.Clustering {
     /// <returns>A List of Cluster objects containing each of its members in the Members attribute.</returns>
     public static List<Cluster<T>> KCluster<T>(int k, int iterationCount, Func<double[], double[], double> distance, List<T> rows) where T : IClusterable {
 
+      if (rows.Count() == 0)
+        return new List<Cluster<T>>();
+
       Random random = new Random();
 
       int MIN = 0;
