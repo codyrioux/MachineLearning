@@ -27,16 +27,16 @@ namespace MachineLearning.Clustering {
       /// <summary>
       /// Constructor for the Cluster class.
       /// </summary>
-      /// <param name="data">A Double[] representing the data points on which to cluster.</param>
-      public Cluster(Double[] data) {
-        Data = data;
+      /// <param name="features">A Double[] representing the data points on which to cluster.</param>
+      public Cluster(Double[] features) {
+        Features = features;
         Members = new List<T>();
       }
 
       /// <summary>
       /// A Double[] exposed to allow clusters to have a "centroid" data point.
       /// </summary>
-      public Double[] Data { get; set; }
+      public Double[] Features { get; set; }
 
       /// <summary>
       /// A list of IClusterable objects that belong to this cluster.
@@ -64,7 +64,7 @@ namespace MachineLearning.Clustering {
 
       int MIN = 0;
       int MAX = 1;
-      int attributeCount = rows[0].ClusteringData.Count();
+      int attributeCount = rows[0].Features.Count();
       double highestMax = 0.0;
 
       // Find the min and max for each column
@@ -75,7 +75,7 @@ namespace MachineLearning.Clustering {
 
       foreach (var row in rows) {
         int count = 0;
-        foreach (var value in row.ClusteringData) {
+        foreach (var value in row.Features) {
           if (value.CompareTo(ranges[count][MIN]) < 0)
             ranges[count][MIN] = value;
           if (value.CompareTo(ranges[count][MAX]) > 0) {
@@ -112,7 +112,7 @@ namespace MachineLearning.Clustering {
           Cluster<T> bestCluster = centroids[0];
 
           foreach (var cluster in centroids) {
-            double d = distance(cluster.Data, row.ClusteringData);
+            double d = distance(cluster.Features, row.Features);
             if (d < bestDistance) {
               bestDistance = d;
               bestCluster = cluster;
@@ -130,14 +130,14 @@ namespace MachineLearning.Clustering {
         foreach (var centroid in centroids) {
 
           Double[] averages = new Double[attributeCount];
-          averages = centroid.Data;
+          averages = centroid.Features;
           if (centroid.Members.Count != 0) {
             for (int j = 0; j < attributeCount; ++j)
               averages[j] = 0.0;
 
             foreach (var member in centroid.Members) {
               int index = 0;
-              foreach (var item in member.ClusteringData) {
+              foreach (var item in member.Features) {
                 averages[index++] += item;
               }
             }
@@ -146,7 +146,7 @@ namespace MachineLearning.Clustering {
               averages[index] /= centroid.Members.Count();
           }
 
-          centroid.Data = averages;
+          centroid.Features = averages;
           centroid.Members.Clear();
         }
       }

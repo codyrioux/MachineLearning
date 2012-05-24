@@ -13,6 +13,6 @@ namespace MachineLearning.Clustering {
     /// <summary>
     /// A Double[] filled with data points that allow the object to have it's distance calculated from others.
     /// </summary>
-    Double[] ClusteringData { get; }
+    Double[] Features { get; }
   }
 }
