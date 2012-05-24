@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using MachineLearning.Util;
 
 namespace MachineLearning.Clustering {
   /// <summary>
@@ -45,114 +45,66 @@ namespace MachineLearning.Clustering {
     }
 #endregion
 
-#region Clustering Algorithms
+# region Clustering Algorithms
+
+    private static readonly int MIN = 0;
+    private static readonly int MAX = 1;
+
     /// <summary>
     /// This function will perform a K Means Cluster on the provided data set.
     /// </summary>
     /// <typeparam name="T">The type of data to be clustered.</typeparam>
     /// <param name="k">The number of clusters to use.</param>
-    /// <param name="iterationCount">The number of iterations to perform.</param>
+    /// <param name="maxIterations">The number of iterations to perform.</param>
     /// <param name="distance">A function that acceps two double[] and retuns a double representing the distance between the two vectors.</param>
     /// <param name="rows">The set of data to cluster, must be IEnumerable with doubles representing the data points to cluster on.</param>
     /// <returns>A List of Cluster objects containing each of its members in the Members attribute.</returns>
-    public static List<Cluster<T>> KCluster<T>(int k, int iterationCount, Func<double[], double[], double> distance, List<T> rows) where T : IClusterable {
+    public static List<Cluster<T>> KCluster<T>(int k, int maxIterations, Func<double[], double[], double> distance, List<T> rows) where T : IClusterable {
 
       if (rows.Count() == 0)
         return new List<Cluster<T>>();
 
       Random random = new Random();
-
-      int MIN = 0;
-      int MAX = 1;
-      int attributeCount = rows[0].Features.Count();
-      double highestMax = 0.0;
-
-      // Find the min and max for each column
-      Double[][] ranges = new Double[attributeCount][];
-      for (int i = 0; i < attributeCount; ++i) {
-        ranges[i] = new Double[] { 0, 0 };
-      }
-
-      foreach (var row in rows) {
-        int count = 0;
-        foreach (var value in row.Features) {
-          if (value.CompareTo(ranges[count][MIN]) < 0)
-            ranges[count][MIN] = value;
-          if (value.CompareTo(ranges[count][MAX]) > 0) {
-            ranges[count][MAX] = value;
-            if (value.CompareTo(highestMax) > 0)
-              highestMax = value;
-          }
-          ++count;
-        }
-      }
-
-      // Create k randomly placed centroids
+      int featureCount = rows.First().Features.Count();
       List<Cluster<T>> centroids = new List<Cluster<T>>();
-      for (int i = 0; i < k; ++i) {
-        Double[] randomData = new Double[attributeCount];
-
-        for (int column = 0; column < attributeCount; ++column) {
-          randomData[column] = random.NextDouble() * (ranges[column][MAX] - ranges[column][MIN] + ranges[column][MIN]);
-        }
-
-        Cluster<T> newCluster = new Cluster<T>(randomData);
-        centroids.Add(newCluster);
-      }
-
       List<Cluster<T>> lastMatches = new List<Cluster<T>>();
 
-      // Iterate iterationCount times or until done
-      for (int i = 0; i < iterationCount; ++i) {
+      // Find the min and max for each column
+      Double[][] ranges = new Double[featureCount][];
+			for(int featureIndex = 0; featureIndex < featureCount; ++featureIndex) {
+				ranges[featureIndex][MIN] 	= rows.Select(row => row.Features[featureIndex]).ToList().Min();
+				ranges[featureIndex][MAX] 	= rows.Select(row => row.Features[featureIndex]).ToList().Max();
+			}
 
-        // Find which centroid is closest for each row
-        foreach (var row in rows) {
-
-          double bestDistance = highestMax;
-          Cluster<T> bestCluster = centroids[0];
-
-          foreach (var cluster in centroids) {
-            double d = distance(cluster.Features, row.Features);
-            if (d < bestDistance) {
-              bestDistance = d;
-              bestCluster = cluster;
-            }
-          }
-          bestCluster.Members.Add(row);
+      // Create k randomly placed centroids
+      for (int i = 0; i < k; ++i) {
+        Double[] randomData = new Double[featureCount];
+        for (int column = 0; column < featureCount; ++column) {
+          randomData[column] = random.NextDouble() * (ranges[column][MAX] - ranges[column][MIN] + ranges[column][MIN]);
         }
+        centroids.Add(new Cluster<T>(randomData));
+      }
 
-        // If the results are the same as last time, this is complete
+      // Iterate iterationCount times or until done
+      for (int i = 0; i < maxIterations; ++i) {
+        // Find which centroid is closest for each row and add it to that centroids members
+				rows.ForEach(row =>
+						centroids.Aggregate((closest, centroid) => (closest == null || distance(centroid.Features, row.Features) < distance(closest.Features, row.Features) ? centroid : closest)).Do(c => c.Members.Add(row)));
+
+        // If the results are the same as last time then return the list
         if (lastMatches == centroids)
           break;
         lastMatches = centroids;
 
-        // Move the centroids to the average of their members
-        foreach (var centroid in centroids) {
-
-          Double[] averages = new Double[attributeCount];
-          averages = centroid.Features;
-          if (centroid.Members.Count != 0) {
-            for (int j = 0; j < attributeCount; ++j)
-              averages[j] = 0.0;
-
-            foreach (var member in centroid.Members) {
-              int index = 0;
-              foreach (var item in member.Features) {
-                averages[index++] += item;
-              }
-            }
-
-            for (int index = 0; index < attributeCount; ++index)
-              averages[index] /= centroid.Members.Count();
-          }
-
-          centroid.Features = averages;
-          centroid.Members.Clear();
-        }
+				centroids.ForEach(centroid => {
+					for(int featureIndex = 0; featureIndex < featureCount; ++featureIndex) {
+					  centroid.Features[featureIndex] = centroid.Members.Select(item => item.Features[featureIndex]).ToList().Average();
+					}
+					centroid.Members.Clear();
+				});
       }
       return lastMatches;
     }
-
 #endregion
   }
 }

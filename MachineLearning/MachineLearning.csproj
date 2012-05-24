@@ -45,6 +45,7 @@
     <Compile Include="Distance\EuclideanDistance.cs" />
     <Compile Include="Distance\ManhattanDistance.cs" />
     <Compile Include="Distance\PearsonDistance.cs" />
+    <Compile Include="Util\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
