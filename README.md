@@ -1,21 +1,18 @@
- ============
- = Contents =
- ============
+# Contents
 1. Introduction
 2. Documentation
 2. Testing
 4. Version Control
 5. Todo
 
- ===================
- = 1. Introduction =
- ===================
+ # 1. Introduction =
 
 I was not satisfied with any of the K Means Clustering algorithms written in C# that I could find online.
 I created this library to serve as a generic K Means Clustering library, its far from perfect but it works and I will continue to update it. I plan to update this library with other machine learning algorithms written in C# as I need them.
 
-= Sample Usage For K Means Clustering =
+## Sample Usage For K Means Clustering 
 
+```csharp
 List<ObjectThatImplementsIClusterable> myList = new List<ObjectThatImplementsIClusterable>();
 
 // Fill myList with stuff
@@ -28,28 +25,17 @@ var clusters = MachineLearning.Clustering.Algorithms.KCluster(
 
 foreach (var cluster in clusters)
     // Group members are in cluster.Members collection
+```
 
 
- ====================
- = 2. Documentation =
- ====================
+# 2. Documentation 
 
 This project uses visual studio's built in XML documentation format.
 
- ==============
- = 3. Testing =
- ==============
+ # 3. Testing
 
 It doesn't look like visual studio test projects are available in the express edition, which is what I'm currently using when at home. As a result I'll be moving the tests to NUnit when I get a chance. Until such time there will be no tests.
 
- ======================
- = 4. Version Control =
- ======================
+# 4. Version Control
 
 I/We use the following workflow with git: http://reinh.com/blog/2009/03/02/a-git-workflow-for-agile-teams.html
-
- ===========
- = 5. Todo =
- ===========
-
-- Come up with some more ideas to implement.
